@@ -1,0 +1,90 @@
+doctype html
+html
+  head
+    title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/bootstrap-3.3.7-dist/css/bootstrap.min.css')
+    script(src='/javascripts/jquery-3.1.1.min.js')
+    script(src='/bootstrap-3.3.7-dist/js/bootstrap.min.js')
+  body(style='background: #dcd9da')
+    // h1= title
+    .container
+      .row
+        .col-md-4.col-md-offset-4
+          .panel.panel-default(style='margin-top: 100px')
+            .panel-heading(style='background: #0d6aad')
+              h4(align='center', style='color: #ffffff;')
+                | express-jade-bootstrap-mysql-demo
+            .panel-body(style='background: #e0e1ea')
+              .form-group
+                .input-group
+                  span.input-group-addon &#x8D26;&#x53F7;
+                  input#username.form-control(type='text', placeholder='请输入账号')
+              .form-group
+                .input-group
+                  span.input-group-addon &#x5BC6;&#x7801;
+                  input#password.form-control(type='password', placeholder='请输入密码')
+              .form-group
+                .col-lg-offset-7
+                  | &#x6CA1;&#x6709;&#x8D26;&#x53F7;&#xFF1F;
+                  a(href='/register') &#x6CE8;&#x518C;
+              .form-group
+                button#login.btn.btn-success.btn-block(type='button')
+                  | &#x767B;&#x5F55;
+              #popup.alert.alert-warning
+                a#close.close(href='#') &times;
+                div(align='center')
+                  strong#popup-content(style='color: #b12e30;')
+    script(type='text/javascript').
+      $(document).ready(function () {
+        var username = $("#username");
+        var password = $("#password");
+        var login = $("#login");
+        var popup = $("#popup");
+        var popupContent = $("#popup-content");
+        var close = $("#close");
+        popup.hide();
+        close.click(function () {
+          popup.hide();
+        });
+        login.click(function () {
+          if (username.val() == "" || password.val() == "") {
+            popup.show();
+            popupContent.html("账号或密码不能为空！");
+          } else {
+            $.ajax({
+                      url: "/login/userLogin",
+                      data: {
+                        username: $("#username").val(),
+                        password: $("#password").val()
+                      },
+                      type: "POST",
+                      timeout: 36000,
+                      dataType: "text",
+                      success: function (data, textStatus) {
+                        //alert(data);
+                        var dataJson = eval("(" + data + ")");
+                        if (dataJson.code == 200) {
+                          alert("登录成功");
+                          window.location.href = "/";
+                        } else if (dataJson.code == 300) {
+                          popup.show();
+                          popupContent.html("账号不存在，请重新输入！");
+                        } else if (dataJson.code == 400) {
+                          popup.show();
+                          popupContent.html("密码有误，请重新输入！");
+                        } else {
+                          popup.show();
+                          popupContent.html("登录出错！");
+                        }
+                      },
+                      error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert("error:" + textStatus);
+                      }
+                    }
+            );
+          }
+        })
+        ;
+      })
+      ;

@@ -1,0 +1,103 @@
+doctype html
+html
+  head
+    title
+    link(rel='stylesheet', href='/bootstrap-3.3.7-dist/css/bootstrap.min.css')
+    script(src='/javascripts/jquery-3.1.1.min.js')
+    script(src='/bootstrap-3.3.7-dist/js/bootstrap.min.js')
+  body(style='background: #dcd9da')
+    nav.collapse.navbar-collapse.navbar-inverse
+      .navbar-header
+        a.navbar-brand express-jade-bootstrap-mysql-demo
+      ul.nav.navbar-nav.navbar-right
+        li(style='margin-right: 20px')
+          a(href='/login')
+            span.glyphicon.glyphicon-log-in
+            |  &#x767B;&#x5F55;
+    .container
+      .row
+        .col-md-4.col-md-offset-4
+          .panel.panel-default(style='margin-top: 40px')
+            .panel-heading(style='background: #0d6aad')
+              h3(align='center', style='color: #ffffff;')
+                | &#x8D26;&#x53F7;&#x6CE8;&#x518C;
+            .panel-body(style='background: #e0e1ea')
+              .form-group
+                .input-group
+                  span.input-group-addon &nbsp;&nbsp;&#x8D26;&nbsp;&nbsp;&nbsp;&#x53F7;&nbsp;&nbsp;
+                  input#username.form-control(type='text', placeholder='请输入账号')
+              .form-group
+                .input-group
+                  span.input-group-addon &nbsp;&nbsp;&#x5BC6;&nbsp;&nbsp;&nbsp;&#x7801;&nbsp;&nbsp;
+                  input#password.form-control(type='password', placeholder='请输入密码')
+              .form-group
+                .input-group
+                  span.input-group-addon &#x786E;&#x8BA4;&#x5BC6;&#x7801;
+                  input#password1.form-control(type='password', placeholder='请再次输入密码')
+              .form-group
+                .input-group
+                  span.input-group-addon &nbsp;&nbsp;&#x59D3;&nbsp;&nbsp;&nbsp;&#x540D;&nbsp;&nbsp;
+                  input#name.form-control(type='text', placeholder='请输入姓名')
+              .form-group
+                button#register.btn.btn-success.btn-block(type='button')
+                  | &#x6CE8;&#x518C;
+              #popup.alert.alert-warning
+                a#close.close(href='#') &times;
+                div(align='center')
+                  strong#popup-content(style='color: #b12e30;')
+    script(type='text/javascript').
+      $(document).ready(function () {
+        var username = $("#username");
+        var password = $("#password");
+        var password1 = $("#password1");
+        var name = $("#name");
+        var register = $("#register");
+        var popup = $("#popup");
+        var popupContent = $("#popup-content");
+        var close = $("#close");
+        popup.hide();
+        close.click(function () {
+          popup.hide();
+        });
+        register.click(function () {
+          if (username.val() == "" || password.val() == "" || password1.val() == "" || name.val() == "") {
+            popup.show();
+            popupContent.html("注册信息不能为空！");
+          } else if (password.val() !== password1.val()) {
+            popup.show();
+            popupContent.html("两次输入的密码不一样！");
+          } else {
+            //访问服务器，将注册信息写入数据库
+            $.ajax({
+              url: "/register/userRegister",
+              data: {
+                username: $("#username").val(),
+                password: $("#password").val(),
+                name: $("#name").val()
+              },
+              type: "POST",
+              timeout: 36000,
+              dataType: "text",
+              success: function (data, textStatus) {
+                var dataJson = eval("(" + data + ")");
+                if (dataJson.code == 200) {
+                  alert("注册成功");
+                  window.location.href = "/login";
+                } else if (dataJson.code == 300) {
+                  popup.show();
+                  popupContent.html("该账号已存在！");
+                } else if (dataJson.code == 400) {
+                  popup.show();
+                  popupContent.html("注册失败，请重新注册！");
+                } else {
+                  popup.show();
+                  popupContent.html("注册出错！");
+                }
+              },
+              error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert("error:" + textStatus);
+              }
+            });
+          }
+        });
+      });
